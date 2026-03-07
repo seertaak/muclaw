@@ -26,18 +26,20 @@ AsioCurl::AsioCurl(asio::io_context& io) : io_{io}, ssl_ctx_{ssl::context::tlsv1
     ssl_ctx_.set_verify_mode(ssl::verify_peer);
 }
 
-auto AsioCurl::get(std::string_view host, std::string_view target, std::vector<HttpHeader> const& headers)
-    -> asio::awaitable<std::string> {
-    co_return co_await do_request(Method::Get, host, target, "", headers);
+auto AsioCurl::get(std::string_view host, std::string_view target, std::vector<HttpHeader> const& headers,
+                   std::chrono::milliseconds timeout) -> asio::awaitable<std::string> {
+    co_return co_await do_request(Method::Get, host, target, "", headers, timeout);
 }
 
 auto AsioCurl::post(std::string_view host, std::string_view target, std::string const& body,
-                    std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
-    co_return co_await do_request(Method::Post, host, target, body, headers);
+                    std::vector<HttpHeader> const& headers, std::chrono::milliseconds timeout)
+    -> asio::awaitable<std::string> {
+    co_return co_await do_request(Method::Post, host, target, body, headers, timeout);
 }
 
 auto AsioCurl::do_request(Method method, std::string_view host, std::string_view target, std::string const& body,
-                          std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
+                          std::vector<HttpHeader> const& headers, std::chrono::milliseconds timeout)
+    -> asio::awaitable<std::string> {
     auto port = "443";
     std::string host_str{host};
 
@@ -51,10 +53,10 @@ auto AsioCurl::do_request(Method method, std::string_view host, std::string_view
 
     auto const results = co_await resolver.async_resolve(host_str, port, asio::use_awaitable);
 
-    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(30));
+    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(10));
     co_await beast::get_lowest_layer(stream).async_connect(results, asio::use_awaitable);
 
-    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(30));
+    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(10));
     co_await stream.async_handshake(ssl::stream_base::client, asio::use_awaitable);
 
     http::verb b_method = (method == Method::Get) ? http::verb::get : http::verb::post;
@@ -71,12 +73,13 @@ auto AsioCurl::do_request(Method method, std::string_view host, std::string_view
         req.prepare_payload();
     }
 
-    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(30));
+    beast::get_lowest_layer(stream).expires_after(std::chrono::seconds(10));
     co_await http::async_write(stream, req, asio::use_awaitable);
 
     beast::flat_buffer buffer;
     http::response<http::string_body> res;
 
+    beast::get_lowest_layer(stream).expires_after(timeout);
     co_await http::async_read(stream, buffer, res, asio::use_awaitable);
 
     beast::error_code ec;

@@ -41,7 +41,9 @@ auto main(int argc, char** argv) -> int {
 
     auto test_tg = test_cmd->add_subcommand("telegram", "Test telegram integration");
     int64_t chat_id = 0;
+    int32_t timeout_sec = 30;
     test_tg->add_option("-c,--chat", chat_id, "Telegram Chat ID to send the test message to")->required();
+    test_tg->add_option("-t,--timeout", timeout_sec, "Timeout in seconds to wait for a reply");
 
     auto test_llm = test_cmd->add_subcommand("llm", "Test LLM integration");
 
@@ -62,8 +64,20 @@ auto main(int argc, char** argv) -> int {
                 io,
                 [&]() -> asio::awaitable<void> {
                     log::info("Sending test message to chat id {}...", chat_id);
-                    co_await tg.send_message(chat_id, "Hello, World! from muclaw test");
-                    log::info("Test message sent successfully.");
+                    auto sent_msg_id = co_await tg.send_message(
+                        chat_id, "Hi -- I'm muclaw! Please confirm you can see me by replying with any message in this chat.");
+
+                    log::info("Waiting for reply (timeout: {}s, after message {})...", timeout_sec, sent_msg_id);
+                    auto reply = co_await tg.wait_for_reply(chat_id, std::chrono::seconds(timeout_sec), sent_msg_id);
+
+                    if (reply) {
+                        log::info("Reply received: {}", *reply);
+                        co_await tg.send_message(chat_id, fmt::format("Great, Telegram functionality is working. Here's what you said: {}", *reply));
+                        log::info("Success message sent.");
+                    } else {
+                        log::error("Timeout waiting for user reply in chat {}.", chat_id);
+                        co_await tg.send_message(chat_id, "Hey silly, you forgot to reply!");
+                    }
                 },
                 asio::detached);
             io.run();
