@@ -10,7 +10,7 @@
 
 #include <string>
 
-namespace nclaw {
+namespace muclaw {
 
 class Assistant {
 public:
@@ -27,4 +27,4 @@ private:
     TelegramClient tg_;
 };
 
-} // namespace nclaw
+} // namespace muclaw

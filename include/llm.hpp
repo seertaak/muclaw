@@ -8,13 +8,14 @@
 #include <string>
 #include <string_view>
 
-namespace nclaw {
+namespace muclaw {
 
 class LlmClient {
 public:
     LlmClient(boost::asio::io_context& io, std::string host, std::string api_key);
 
-    auto chat_completion(std::string_view system_prompt, std::string_view user_prompt) -> boost::asio::awaitable<std::string>;
+    auto chat_completion(std::string_view system_prompt, std::string_view user_prompt)
+        -> boost::asio::awaitable<std::string>;
 
 private:
     auto post_request(std::string_view target, std::string const& body) -> boost::asio::awaitable<std::string>;
@@ -24,5 +25,4 @@ private:
     std::string api_key_;
 };
 
-} // namespace nclaw
-
+} // namespace muclaw

@@ -1,7 +1,7 @@
 #include "assistant.hpp"
 #include "database.hpp"
-#include "telegram.hpp"
 #include "logger.hpp"
+#include "telegram.hpp"
 
 #include <CLI/CLI.hpp>
 #include <boost/asio/awaitable.hpp>
@@ -15,16 +15,17 @@
 #include <string>
 
 namespace asio = boost::asio;
-using namespace nclaw;
+using namespace muclaw;
 
 auto run_assistant(asio::io_context& io) -> asio::awaitable<void> {
     log::info("muclaw main loop starting...");
-    
+
     auto tg_token = std::getenv("TELEGRAM_BOT_TOKEN");
     auto llm_key = std::getenv("OPENAI_API_KEY");
 
     if (!tg_token || !llm_key) {
-        log::error("Environment variables TELEGRAM_BOT_TOKEN and OPENAI_API_KEY must be set.");
+        log::error("Environment variables TELEGRAM_BOT_TOKEN and OPENAI_API_KEY "
+                   "must be set.");
         co_return;
     }
 
@@ -37,11 +38,11 @@ auto main(int argc, char** argv) -> int {
     app.require_subcommand(0, 1);
 
     auto test_cmd = app.add_subcommand("test", "Test integrations");
-    
+
     auto test_tg = test_cmd->add_subcommand("telegram", "Test telegram integration");
     int64_t chat_id = 0;
     test_tg->add_option("-c,--chat", chat_id, "Telegram Chat ID to send the test message to")->required();
-    
+
     auto test_llm = test_cmd->add_subcommand("llm", "Test LLM integration");
 
     CLI11_PARSE(app, argc, argv);
@@ -57,11 +58,14 @@ auto main(int argc, char** argv) -> int {
                 return 1;
             }
             TelegramClient tg{io, std::string{tg_token}};
-            asio::co_spawn(io, [&]() -> asio::awaitable<void> {
-                log::info("Sending test message to chat id {}...", chat_id);
-                co_await tg.send_message(chat_id, "Hello, World! from muclaw test");
-                log::info("Test message sent successfully.");
-            }, asio::detached);
+            asio::co_spawn(
+                io,
+                [&]() -> asio::awaitable<void> {
+                    log::info("Sending test message to chat id {}...", chat_id);
+                    co_await tg.send_message(chat_id, "Hello, World! from muclaw test");
+                    log::info("Test message sent successfully.");
+                },
+                asio::detached);
             io.run();
             return 0;
         }

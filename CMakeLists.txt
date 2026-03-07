@@ -5,6 +5,7 @@ project(muclaw VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS False)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # For Conan 2.x CMakeToolchain
 find_package(Boost REQUIRED COMPONENTS system thread coroutine context)
@@ -16,7 +17,7 @@ find_package(OpenSSL REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(CLI11 REQUIRED)
 
-add_library(nanoclaw_core
+add_library(muclaw_core
     src/database.cpp
     src/telegram.cpp
     src/llm.cpp
@@ -25,9 +26,9 @@ add_library(nanoclaw_core
     src/assistant.cpp
 )
 
-target_include_directories(nanoclaw_core PUBLIC include)
+target_include_directories(muclaw_core PUBLIC include)
 
-target_link_libraries(nanoclaw_core PUBLIC
+target_link_libraries(muclaw_core PUBLIC
     Boost::context
     Boost::thread
     Boost::system
@@ -40,23 +41,23 @@ target_link_libraries(nanoclaw_core PUBLIC
 )
 
 if(MSVC)
-    target_compile_options(nanoclaw_core PUBLIC /W4 /WX)
+    target_compile_options(muclaw_core PUBLIC /W4 /WX)
 else()
-    target_compile_options(nanoclaw_core PUBLIC -Wall -Wextra -Wpedantic -Werror)
+    target_compile_options(muclaw_core PUBLIC -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # Main Executable
-add_executable(nanoclaw src/main.cpp)
-target_link_libraries(nanoclaw PRIVATE nanoclaw_core)
+add_executable(muclaw src/main.cpp)
+target_link_libraries(muclaw PRIVATE muclaw_core)
 
 # Tests
 enable_testing()
-add_executable(nanoclaw_tests
+add_executable(muclaw_tests
     tests/test_database.cpp
     tests/test_vector_db.cpp
     tests/test_asio_curl.cpp
 )
-target_link_libraries(nanoclaw_tests PRIVATE nanoclaw_core Catch2::Catch2WithMain)
+target_link_libraries(muclaw_tests PRIVATE muclaw_core Catch2::Catch2WithMain)
 
 include(Catch)
-catch_discover_tests(nanoclaw_tests)
+catch_discover_tests(muclaw_tests)

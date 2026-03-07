@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-namespace nclaw {
+namespace muclaw {
 
 class TelegramClient {
 public:
@@ -29,4 +29,4 @@ private:
     int64_t offset_{0};
 };
 
-} // namespace nclaw
+} // namespace muclaw

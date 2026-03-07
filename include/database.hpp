@@ -7,28 +7,28 @@
 #include <string>
 #include <string_view>
 
-namespace nclaw {
+namespace muclaw {
 
 class Database {
 public:
-  Database() = default;
-  ~Database();
+    Database() = default;
+    ~Database();
 
-  // Prevent copies
-  Database(Database const &) = delete;
-  auto operator=(Database const &) -> Database & = delete;
+    // Prevent copies
+    Database(Database const&) = delete;
+    auto operator=(Database const&) -> Database& = delete;
 
-  Database(Database &&) = default;
-  auto operator=(Database &&) -> Database & = default;
+    Database(Database&&) = default;
+    auto operator=(Database&&) -> Database& = default;
 
-  auto open(std::string_view path) -> void;
-  auto close() -> void;
+    auto open(std::string_view path) -> void;
+    auto close() -> void;
 
-  auto put(std::string_view k, std::string_view v) -> void;
-  auto value(std::string_view k) const -> std::optional<std::string>;
+    auto put(std::string_view k, std::string_view v) -> void;
+    auto value(std::string_view k) const -> std::optional<std::string>;
 
 private:
-  std::unique_ptr<rocksdb::DB> db{};
+    std::unique_ptr<rocksdb::DB> db{};
 };
 
-} // namespace nclaw
+} // namespace muclaw

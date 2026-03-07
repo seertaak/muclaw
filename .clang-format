@@ -19,8 +19,7 @@ SpaceBeforeParens: ControlStatements
 # Column limit
 ColumnLimit: 120
 
-# Force trailing return types for auto funcs
-TrailingReturn: true
+# Force trailing return types for auto funcs (NOTE: clang-format doesn't have a direct toggle for this)
 
 # Access modifiers
 AccessModifierOffset: -4

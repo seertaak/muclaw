@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace nclaw {
+namespace muclaw {
 
 struct SearchResult {
     int64_t id;
@@ -27,4 +27,4 @@ private:
     faiss::IndexIDMap id_map_;
 };
 
-} // namespace nclaw
+} // namespace muclaw

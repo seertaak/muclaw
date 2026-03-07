@@ -19,23 +19,25 @@ namespace http = beast::http;
 namespace ssl = asio::ssl;
 using tcp = asio::ip::tcp;
 
-namespace nclaw {
+namespace muclaw {
 
-AsioCurl::AsioCurl(asio::io_context& io)
-    : io_{io}, ssl_ctx_{ssl::context::tlsv12_client} {
+AsioCurl::AsioCurl(asio::io_context& io) : io_{io}, ssl_ctx_{ssl::context::tlsv12_client} {
     ssl_ctx_.set_default_verify_paths();
     ssl_ctx_.set_verify_mode(ssl::verify_peer);
 }
 
-auto AsioCurl::get(std::string_view host, std::string_view target, std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
+auto AsioCurl::get(std::string_view host, std::string_view target, std::vector<HttpHeader> const& headers)
+    -> asio::awaitable<std::string> {
     co_return co_await do_request(Method::Get, host, target, "", headers);
 }
 
-auto AsioCurl::post(std::string_view host, std::string_view target, std::string const& body, std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
+auto AsioCurl::post(std::string_view host, std::string_view target, std::string const& body,
+                    std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
     co_return co_await do_request(Method::Post, host, target, body, headers);
 }
 
-auto AsioCurl::do_request(Method method, std::string_view host, std::string_view target, std::string const& body, std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
+auto AsioCurl::do_request(Method method, std::string_view host, std::string_view target, std::string const& body,
+                          std::vector<HttpHeader> const& headers) -> asio::awaitable<std::string> {
     auto port = "443";
     std::string host_str{host};
 
@@ -59,7 +61,7 @@ auto AsioCurl::do_request(Method method, std::string_view host, std::string_view
     http::request<http::string_body> req{b_method, target, 11};
     req.set(http::field::host, host);
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    
+
     for (auto const& h : headers) {
         req.set(h.name, h.value);
     }
@@ -90,4 +92,4 @@ auto AsioCurl::do_request(Method method, std::string_view host, std::string_view
     co_return res.body();
 }
 
-} // namespace nclaw
+} // namespace muclaw

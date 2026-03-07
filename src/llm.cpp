@@ -8,27 +8,22 @@
 
 namespace asio = boost::asio;
 
-namespace nclaw {
+namespace muclaw {
 
 LlmClient::LlmClient(asio::io_context& io, std::string host, std::string api_key)
-    : curl_{io}, host_{std::move(host)}, api_key_{std::move(api_key)} {
-}
+    : curl_{io}, host_{std::move(host)}, api_key_{std::move(api_key)} {}
 
 auto LlmClient::post_request(std::string_view target, std::string const& body) -> asio::awaitable<std::string> {
-    std::vector<HttpHeader> headers = {
-        {"Content-Type", "application/json"},
-        {"Authorization", fmt::format("Bearer {}", api_key_)}
-    };
+    std::vector<HttpHeader> headers = {{"Content-Type", "application/json"},
+                                       {"Authorization", fmt::format("Bearer {}", api_key_)}};
 
     co_return co_await curl_.post(host_, target, body, headers);
 }
 
-auto LlmClient::chat_completion(std::string_view system_prompt, std::string_view user_prompt) -> asio::awaitable<std::string> {
+auto LlmClient::chat_completion(std::string_view system_prompt, std::string_view user_prompt)
+    -> asio::awaitable<std::string> {
     nlohmann::json req_body = {
-        {"messages", {
-            {{"role", "system"}, {"content", system_prompt}},
-            {{"role", "user"}, {"content", user_prompt}}
-        }},
+        {"messages", {{{"role", "system"}, {"content", system_prompt}}, {{"role", "user"}, {"content", user_prompt}}}},
         {"model", "gpt-3.5-turbo"} // Fallback or configurable later
     };
 
@@ -49,4 +44,4 @@ auto LlmClient::chat_completion(std::string_view system_prompt, std::string_view
     }
 }
 
-} // namespace nclaw
+} // namespace muclaw

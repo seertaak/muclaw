@@ -3,10 +3,9 @@
 
 #include <stdexcept>
 
-namespace nclaw {
+namespace muclaw {
 
-VectorDatabase::VectorDatabase(int dimension)
-    : dimension_{dimension}, flat_index_{dimension}, id_map_{&flat_index_} {
+VectorDatabase::VectorDatabase(int dimension) : dimension_{dimension}, flat_index_{dimension}, id_map_{&flat_index_} {
     log::info("Initialized VectorDatabase with dimension {}", dimension_);
 }
 
@@ -14,7 +13,7 @@ auto VectorDatabase::add(std::vector<float> const& embedding, int64_t id) -> voi
     if (embedding.size() != static_cast<size_t>(dimension_)) {
         throw std::invalid_argument("Embedding dimension mismatch");
     }
-    
+
     // faiss::IndexIDMap takes ids as faiss::idx_t (which is usually int64_t)
     id_map_.add_with_ids(1, embedding.data(), &id);
 }
@@ -51,4 +50,4 @@ auto VectorDatabase::count() const -> size_t {
     return id_map_.ntotal;
 }
 
-} // namespace nclaw
+} // namespace muclaw
