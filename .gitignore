@@ -1,0 +1,34 @@
+# Build directories
+build/
+CMakeUserPresets.json
+
+# IDEs
+.vscode/
+.idea/
+cmake-build-*/
+.cache/
+
+# Conan
+conanbuild.sh
+conanrun.sh
+conanbuildenv*
+conanrunenv*
+deactivate_conan*
+
+# Binaries and Objects
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Databases
+*.db
+*.db-wal
+*.db-shm
+*.db/*
+test_db/
+
+# Local configuration
+REMEMBER

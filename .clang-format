@@ -1,0 +1,29 @@
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+UseTab: Never
+
+# Function declarations / definitions
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakAfterReturnType: None
+
+# Braces
+BreakBeforeBraces: Attach
+
+# Types/Pointers
+PointerAlignment: Left
+
+# Spaces
+SpaceBeforeParens: ControlStatements
+
+# Column limit
+ColumnLimit: 120
+
+# Force trailing return types for auto funcs
+TrailingReturn: true
+
+# Access modifiers
+AccessModifierOffset: -4
+
+# Namespaces
+NamespaceIndentation: None
