@@ -1,9 +1,9 @@
 #include "asio_curl.hpp"
+#include <boost/asio/awaitable.hpp>
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <exception>
 #include <string>
 
 TEST_CASE("AsioCurl GET request", "[asio_curl]") {
@@ -15,7 +15,6 @@ TEST_CASE("AsioCurl GET request", "[asio_curl]") {
         io,
         [&]() -> boost::asio::awaitable<void> {
             try {
-                // A simple HTTPS get to httpbin
                 auto result = co_await curl.get("httpbin.org", "/get");
                 REQUIRE(result.find("\"url\": \"https://httpbin.org/get\"") != std::string::npos);
             } catch (...) {

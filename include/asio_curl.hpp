@@ -24,8 +24,8 @@ public:
              std::chrono::milliseconds timeout = std::chrono::seconds(30)) -> boost::asio::awaitable<std::string>;
 
     auto post(std::string_view host, std::string_view target, std::string const& body,
-              std::vector<HttpHeader> const& headers = {},
-              std::chrono::milliseconds timeout = std::chrono::seconds(30)) -> boost::asio::awaitable<std::string>;
+              std::vector<HttpHeader> const& headers = {}, std::chrono::milliseconds timeout = std::chrono::seconds(30))
+        -> boost::asio::awaitable<std::string>;
 
 private:
     enum class Method { Get, Post };

@@ -12,7 +12,8 @@ export CXX=/usr/bin/clang++
 echo "Installing dependencies via Conan..."
 # Clear build dir to avoid cached compiler issues
 rm -rf build
-conan install . --output-folder=build --build=missing
+
+conan install . --profile:build=conan_profile --profile:host=conan_profile --build=missing
 
 # 2. Configure CMake using the generated preset, forcing Clang
 echo "Configuring CMake..."

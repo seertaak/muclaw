@@ -4,8 +4,6 @@
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
 
-#include <stdexcept>
-
 namespace asio = boost::asio;
 
 namespace muclaw {
@@ -24,12 +22,12 @@ auto LlmClient::chat_completion(std::string_view system_prompt, std::string_view
     -> asio::awaitable<std::string> {
     nlohmann::json req_body = {
         {"messages", {{{"role", "system"}, {"content", system_prompt}}, {{"role", "user"}, {"content", user_prompt}}}},
-        {"model", "gpt-3.5-turbo"} // Fallback or configurable later
+        {"model", "llama3-8b-8192"} // Groq specific model
     };
 
     try {
         log::info("Sending LLM completion request to {}...", host_);
-        auto res_str = co_await post_request("/v1/chat/completions", req_body.dump());
+        auto res_str = co_await post_request("/openai/v1/chat/completions", req_body.dump());
         auto res_json = nlohmann::json::parse(res_str);
 
         if (res_json.contains("choices") && !res_json["choices"].empty()) {

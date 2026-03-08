@@ -7,6 +7,7 @@
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/thread_pool.hpp>
 
 #include <string>
 
@@ -22,7 +23,8 @@ private:
     auto handle_message(int64_t chat_id, std::string text) -> boost::asio::awaitable<void>;
 
     Database db_;
-    VectorDatabase vdb_;
+    boost::asio::thread_pool worker_pool_;
+    VectorDB vdb_;
     LlmClient llm_;
     TelegramClient tg_;
 };

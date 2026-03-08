@@ -1,12 +1,17 @@
 [requires]
 boost/1.83.0
-rocksdb/10.5.1
+sqlite3/3.45.1
 faiss/1.12.0
 fmt/12.1.0
 nlohmann_json/3.11.3
 openssl/3.2.1
 catch2/3.13.0
 cli11/2.4.2
+llama-cpp/b6565
+
+[options]
+sqlite3/*:enable_fts5=True
+llama-cpp/*:with_examples=True
 
 [generators]
 CMakeDeps

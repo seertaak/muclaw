@@ -1,14 +1,20 @@
 #include "assistant.hpp"
 #include "logger.hpp"
 
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
+#include <cstdint>
 #include <fmt/core.h>
+#include <string>
+#include <utility>
 
 namespace asio = boost::asio;
 
 namespace muclaw {
 
 Assistant::Assistant(asio::io_context& io, std::string telegram_token, std::string llm_host, std::string llm_api_key)
-    : vdb_{1536}, llm_{io, std::move(llm_host), std::move(llm_api_key)}, tg_{io, std::move(telegram_token)} {
+    : worker_pool_{4}, vdb_{worker_pool_, 1536}, llm_{io, std::move(llm_host), std::move(llm_api_key)},
+      tg_{io, std::move(telegram_token)} {
     db_.open("muclaw_db");
 }
 

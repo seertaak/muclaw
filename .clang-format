@@ -9,6 +9,7 @@ AlwaysBreakAfterReturnType: None
 
 # Braces
 BreakBeforeBraces: Attach
+RemoveBracesLLVM: true
 
 # Types/Pointers
 PointerAlignment: Left

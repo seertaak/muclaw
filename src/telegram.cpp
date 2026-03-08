@@ -1,15 +1,26 @@
 #include "telegram.hpp"
+#include "asio_curl.hpp"
 #include "logger.hpp"
 
-#include <boost/asio/co_spawn.hpp>
-#include <boost/asio/detached.hpp>
+#include <algorithm>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/use_awaitable.hpp>
 
+#include <cstdint>
+#include <exception>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include <chrono>
+#include <nlohmann/json_fwd.hpp>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace asio = boost::asio;
 
@@ -31,18 +42,17 @@ auto TelegramClient::post_request(std::string_view method, std::string const& bo
 auto TelegramClient::send_message(int64_t chat_id, std::string_view text) -> asio::awaitable<int64_t> {
     nlohmann::json req_body = {{"chat_id", chat_id}, {"text", text}};
     auto res_str = co_await post_request("sendMessage", req_body.dump());
-    
+
     try {
         auto res_json = nlohmann::json::parse(res_str);
-        if (res_json["ok"].get<bool>()) {
+        if (res_json["ok"].get<bool>())
             co_return res_json["result"]["message_id"].get<int64_t>();
-        } else {
-             log::error("sendMessage failed: {}", res_str);
-        }
+        else
+            log::error("sendMessage failed: {}", res_str);
     } catch (std::exception const& e) {
         log::error("Failed to parse sendMessage response: {}", e.what());
     }
-    
+
     co_return -1;
 }
 
@@ -73,9 +83,8 @@ auto TelegramClient::poll(MessageHandler handler) -> asio::awaitable<void> {
                         log::info("Received message: {}", text);
 
                         // Dispatch to handler
-                        if (handler) {
+                        if (handler)
                             co_await handler(chat_id, text);
-                        }
                     }
                 }
             } else {
@@ -90,8 +99,8 @@ auto TelegramClient::poll(MessageHandler handler) -> asio::awaitable<void> {
     }
 }
 
-auto TelegramClient::wait_for_reply(int64_t expected_chat_id, std::chrono::milliseconds total_timeout, int64_t after_message_id)
-    -> asio::awaitable<std::optional<std::string>> {
+auto TelegramClient::wait_for_reply(int64_t expected_chat_id, std::chrono::milliseconds total_timeout,
+                                    int64_t after_message_id) -> asio::awaitable<std::optional<std::string>> {
 
     auto start_time = std::chrono::steady_clock::now();
 
@@ -105,9 +114,10 @@ auto TelegramClient::wait_for_reply(int64_t expected_chat_id, std::chrono::milli
             co_return std::nullopt;
         }
 
-        // We use long polling, tell telegram server to hold connection open for `poll_timeout_sec`
+        // Telegram API usese long polling, tell telegram server to hold connection open for `poll_timeout_sec`
         auto poll_timeout_sec = std::min<int>(20, std::max<int>(1, remaining.count() / 1000));
-        // Add a few seconds buffer to the HTTP client timeout so it doesn't kill the connection before telegram replies empty
+        // Add a few seconds buffer to the HTTP client timeout so it doesn't kill the connection before telegram replies
+        // empty
         auto http_timeout = std::chrono::seconds(poll_timeout_sec + 5);
 
         nlohmann::json req_body = {{"offset", offset_}, {"timeout", poll_timeout_sec}};
@@ -129,7 +139,7 @@ auto TelegramClient::wait_for_reply(int64_t expected_chat_id, std::chrono::milli
                 res_json = nlohmann::json::parse(res_str);
                 parse_success = true;
             } catch (std::exception const& e) {
-                 log::error("Error parsing Telegram response: {}", e.what());
+                log::error("Error parsing Telegram response: {}", e.what());
             }
 
             if (parse_success) {
@@ -141,15 +151,13 @@ auto TelegramClient::wait_for_reply(int64_t expected_chat_id, std::chrono::milli
                             auto msg_chat_id = update["message"]["chat"]["id"].get<int64_t>();
                             auto msg_id = update["message"]["message_id"].get<int64_t>();
 
-                            if (msg_chat_id == expected_chat_id) {
-                                if (msg_id > after_message_id) {
+                            if (msg_chat_id == expected_chat_id)
+                                if (msg_id > after_message_id)
                                     co_return text;
-                                } else {
+                                else
                                     log::info("Ignored old message ({}) during wait_for_reply", msg_id);
-                                }
-                            } else {
+                            else
                                 log::info("Ignored message from another chat during wait_for_reply: {}", msg_chat_id);
-                            }
                         }
                     }
                 } else {

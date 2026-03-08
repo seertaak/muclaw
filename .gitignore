@@ -31,4 +31,4 @@ deactivate_conan*
 test_db/
 
 # Local configuration
-REMEMBER
+notes/

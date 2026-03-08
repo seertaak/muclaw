@@ -1,0 +1,553 @@
+--- Rebuilding MuClaw ---
+Installing dependencies via Conan...
+
+======== Input profiles ========
+Profile host:
+[settings]
+arch=x86_64
+build_type=Release
+os=Linux
+*:compiler=clang
+*:compiler.cppstd=23
+*:compiler.libcxx=libc++
+*:compiler.version=20
+llama-cpp/*:compiler.cppstd=17
+[conf]
+tools.build:cflags=['-march=native', '-mavx2', '-mf16c', '-mfma']
+tools.build:cxxflags=['-march=native', '-mavx2', '-mf16c', '-mfma']
+
+Profile build:
+[settings]
+arch=x86_64
+build_type=Release
+os=Linux
+*:compiler=clang
+*:compiler.cppstd=23
+*:compiler.libcxx=libc++
+*:compiler.version=20
+llama-cpp/*:compiler.cppstd=17
+[conf]
+tools.build:cflags=['-march=native', '-mavx2', '-mf16c', '-mfma']
+tools.build:cxxflags=['-march=native', '-mavx2', '-mf16c', '-mfma']
+
+
+======== Computing dependency graph ========
+cli11/2.4.2: WARN: cli11/2.4.2: package_type 'header-library' is defined, but 'shared' and/or 'header_only' options are present. The package_type will have precedence over the options regardless of their value.
+Graph root
+    conanfile.txt: /home/mpk/src/muclaw/conanfile.txt
+Requirements
+    boost/1.83.0#3989436c24399e15c01ab4bf165703da - Cache
+    bzip2/1.0.8#c470882369c2d95c5c77e970c0c7e321 - Cache
+    catch2/3.13.0#54042604b2ac1d1ede63a53519806cf1 - Cache
+    cli11/2.4.2#6e507e3d37c863d547be3069be114cce - Cache
+    faiss/1.12.0#78496682d9224200693d6d7055a44530 - Cache
+    fmt/12.1.0#50abab23274d56bb8f42c94b3b9a40c7 - Cache
+    gflags/2.2.2#5e6c53835b1b80975a315bca8fbc9868 - Cache
+    libbacktrace/cci.20210118#a7691bfccd8caaf66309df196790a5a1 - Cache
+    llama-cpp/b6565#87db59a20d2209f720e7aefbd727fd4d - Cache
+    nlohmann_json/3.11.3#45828be26eb619a2e04ca517bb7b828d - Cache
+    openblas/0.3.30#aca4131c143d4c109923372e052c643c - Cache
+    openssl/3.2.1#0aeacdc0b5e7a314f44916c8fabd4595 - Cache
+    sqlite3/3.45.1#d5f7ab74b4670ea4e2bceb366f491322 - Cache
+    zlib/1.3.1#cac0f6daea041b0ccf42934163defb20 - Cache
+Build requirements
+    b2/5.4.2#ffd6084a119587e70f11cd45d1a386e2 - Cache
+    cmake/3.31.11#f325c933f618a1fcebc1e1c0babfd1ba - Cache
+Resolved version ranges
+    b2/[>=5.2 <6]: b2/5.4.2
+    cmake/[>=3.16 <4]: cmake/3.31.11
+    cmake/[>=3.16]: cmake/3.31.11
+    cmake/[>=3.24 <4]: cmake/3.31.11
+    openblas/[^0.3.27]: openblas/0.3.30
+    zlib/[>=1.2.11 <2]: zlib/1.3.1
+
+======== Computing necessary packages ========
+Requirements
+    boost/1.83.0#3989436c24399e15c01ab4bf165703da:e455d7564e67976c6d2c02a8558b5f4e522d2443#4f9e9275e60c4bfac288a88eb20f3943 - Cache
+    bzip2/1.0.8#c470882369c2d95c5c77e970c0c7e321:730dc6298d5baf4e80417bd3cde975c421c4ea85#b7d15e8984c9c117eb0a0a9bc580080d - Cache
+    catch2/3.13.0#54042604b2ac1d1ede63a53519806cf1:825d1ff1df104c83b30a64204313598d15908ce5#91deed369581860ab1e73924414940de - Cache
+    cli11/2.4.2#6e507e3d37c863d547be3069be114cce:da39a3ee5e6b4b0d3255bfef95601890afd80709#bb8d2501d5a8c0f83bcd3cf11ff07806 - Cache
+    faiss/1.12.0#78496682d9224200693d6d7055a44530:12f644687e53f7f390516649b71393c0d3888d0d#8e6b30e6f38216e689bd585a47988e80 - Cache
+    fmt/12.1.0#50abab23274d56bb8f42c94b3b9a40c7:54318d1d690382671a973073492f3b6ae7a3cfe1#6b015545da91e29e10819c5aabe1cf39 - Cache
+    gflags/2.2.2#5e6c53835b1b80975a315bca8fbc9868:5848a2ac132948e62ba27266e87ee654cee7120b#5b6dbadf13b98f904e1e7442ee7ea2af - Cache
+    libbacktrace/cci.20210118#a7691bfccd8caaf66309df196790a5a1:c6ba75a49d01b24213beec98d8903a1714c062a0#e8ad8b17f1943a3283da1b2e79f36d6f - Cache
+    llama-cpp/b6565#87db59a20d2209f720e7aefbd727fd4d:90120a9a959fc529dafcff2e577a4a9b6b33e5c6#a608e2e64b2e3657a39861a6bfbc5169 - Cache
+    nlohmann_json/3.11.3#45828be26eb619a2e04ca517bb7b828d:da39a3ee5e6b4b0d3255bfef95601890afd80709#552828a2560333bcbeff9d087ce0af0f - Cache
+    openblas/0.3.30#aca4131c143d4c109923372e052c643c:01ab7a284e763c43b60aa1594a798d090666d8eb#b2eb5abb59c4501022ec69f604004dd9 - Cache
+    openssl/3.2.1#0aeacdc0b5e7a314f44916c8fabd4595:c73e7a207711e08ecd68d515fcce52133404f372#06564cd02ac474eeb84f528fc7290c7c - Cache
+    sqlite3/3.45.1#d5f7ab74b4670ea4e2bceb366f491322:e6001e44a3e3340aa78e62be53ee284dba499a5e#66ad22b3a67f3c010d749ef3f3d568f7 - Cache
+    zlib/1.3.1#cac0f6daea041b0ccf42934163defb20:c6ba75a49d01b24213beec98d8903a1714c062a0#bf740b40bed200c4604e229932e52c97 - Cache
+Build requirements
+Skipped binaries
+    b2/5.4.2, cmake/3.31.11
+
+======== Installing packages ========
+bzip2/1.0.8: Already installed! (1 of 14)
+cli11/2.4.2: Already installed! (2 of 14)
+fmt/12.1.0: Already installed! (3 of 14)
+gflags/2.2.2: Already installed! (4 of 14)
+libbacktrace/cci.20210118: Already installed! (5 of 14)
+llama-cpp/b6565: Already installed! (6 of 14)
+nlohmann_json/3.11.3: Already installed! (7 of 14)
+sqlite3/3.45.1: Already installed! (8 of 14)
+zlib/1.3.1: Already installed! (9 of 14)
+catch2/3.13.0: Already installed! (10 of 14)
+openblas/0.3.30: Already installed! (11 of 14)
+boost/1.83.0: Already installed! (12 of 14)
+openssl/3.2.1: Already installed! (13 of 14)
+faiss/1.12.0: Already installed! (14 of 14)
+WARN: deprecated: Usage of deprecated Conan 1.X features that will be removed in Conan 2.X:
+WARN: deprecated:     'cpp_info.names' used in: sqlite3/3.45.1, cli11/2.4.2, boost/1.83.0, openssl/3.2.1, bzip2/1.0.8
+WARN: deprecated:     'cpp_info.build_modules' used in: sqlite3/3.45.1, openssl/3.2.1, bzip2/1.0.8
+WARN: deprecated:     'env_info' used in: sqlite3/3.45.1, openssl/3.2.1, boost/1.83.0, bzip2/1.0.8
+WARN: deprecated:     'cpp_info.filenames' used in: sqlite3/3.45.1, boost/1.83.0
+WARN: deprecated:     'user_info' used in: boost/1.83.0
+
+======== Finalizing install (deploy, generators) ========
+conanfile.txt: Writing generators to /home/mpk/src/muclaw/build/Release/generators
+conanfile.txt: Generator 'CMakeDeps' calling 'generate()'
+conanfile.txt: CMakeDeps necessary find_package() and targets for your CMakeLists.txt
+    find_package(Boost)
+    find_package(SQLite3)
+    find_package(faiss)
+    find_package(fmt)
+    find_package(nlohmann_json)
+    find_package(OpenSSL)
+    find_package(Catch2)
+    find_package(CLI11)
+    find_package(llama-cpp)
+    target_link_libraries(... boost::boost SQLite::SQLite3 faiss fmt::fmt nlohmann_json::nlohmann_json openssl::openssl Catch2::Catch2WithMain CLI11::CLI11 llama-cpp::llama-cpp)
+conanfile.txt: Generator 'CMakeToolchain' calling 'generate()'
+conanfile.txt: CMakeToolchain generated: conan_toolchain.cmake
+conanfile.txt: CMakeToolchain: Preset 'conan-release' added to CMakePresets.json.
+    (cmake>=3.23) cmake --preset conan-release
+    (cmake<3.23) cmake <path> -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=generators/conan_toolchain.cmake  -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=Release
+conanfile.txt: CMakeToolchain generated: /home/mpk/src/muclaw/build/Release/generators/CMakePresets.json
+conanfile.txt: CMakeToolchain generated: /home/mpk/src/muclaw/CMakeUserPresets.json
+conanfile.txt: Generating aggregated env files
+conanfile.txt: Generated aggregated env files: ['conanbuild.sh', 'conanrun.sh']
+Install finished successfully
+Configuring CMake...
+-- Using Conan toolchain: /home/mpk/src/muclaw/build/Release/generators/conan_toolchain.cmake
+-- Conan toolchain: Defining architecture flag: -m64
+-- Conan toolchain: Defining libcxx as C++ flags: -stdlib=libc++
+-- Conan toolchain: C++ Standard 23 with extensions OFF
+-- The CXX compiler identification is Clang 21.1.8
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Conan: Component target declared 'Boost::diagnostic_definitions'
+-- Conan: Component target declared 'Boost::disable_autolinking'
+-- Conan: Component target declared 'Boost::dynamic_linking'
+-- Conan: Component target declared 'Boost::headers'
+-- Conan: Component target declared 'Boost::boost'
+-- Conan: Component target declared 'boost::_libboost'
+-- Conan: Component target declared 'Boost::atomic'
+-- Conan: Component target declared 'Boost::container'
+-- Conan: Component target declared 'Boost::context'
+-- Conan: Component target declared 'Boost::date_time'
+-- Conan: Component target declared 'Boost::exception'
+-- Conan: Component target declared 'Boost::math'
+-- Conan: Component target declared 'Boost::program_options'
+-- Conan: Component target declared 'Boost::regex'
+-- Conan: Component target declared 'Boost::serialization'
+-- Conan: Component target declared 'Boost::stacktrace'
+-- Conan: Component target declared 'Boost::system'
+-- Conan: Component target declared 'Boost::timer'
+-- Conan: Component target declared 'Boost::chrono'
+-- Conan: Component target declared 'Boost::coroutine'
+-- Conan: Component target declared 'Boost::filesystem'
+-- Conan: Component target declared 'Boost::json'
+-- Conan: Component target declared 'Boost::math_c99'
+-- Conan: Component target declared 'Boost::math_c99f'
+-- Conan: Component target declared 'Boost::math_c99l'
+-- Conan: Component target declared 'Boost::math_tr1'
+-- Conan: Component target declared 'Boost::math_tr1f'
+-- Conan: Component target declared 'Boost::math_tr1l'
+-- Conan: Component target declared 'Boost::random'
+-- Conan: Component target declared 'Boost::stacktrace_addr2line'
+-- Conan: Component target declared 'Boost::stacktrace_backtrace'
+-- Conan: Component target declared 'Boost::stacktrace_basic'
+-- Conan: Component target declared 'Boost::stacktrace_noop'
+-- Conan: Component target declared 'Boost::test'
+-- Conan: Component target declared 'Boost::url'
+-- Conan: Component target declared 'Boost::wserialization'
+-- Conan: Component target declared 'Boost::fiber'
+-- Conan: Component target declared 'Boost::graph'
+-- Conan: Component target declared 'Boost::iostreams'
+-- Conan: Component target declared 'Boost::nowide'
+-- Conan: Component target declared 'Boost::prg_exec_monitor'
+-- Conan: Component target declared 'Boost::test_exec_monitor'
+-- Conan: Component target declared 'Boost::thread'
+-- Conan: Component target declared 'Boost::wave'
+-- Conan: Component target declared 'Boost::contract'
+-- Conan: Component target declared 'Boost::fiber_numa'
+-- Conan: Component target declared 'Boost::locale'
+-- Conan: Component target declared 'Boost::log'
+-- Conan: Component target declared 'Boost::type_erasure'
+-- Conan: Component target declared 'Boost::unit_test_framework'
+-- Conan: Component target declared 'Boost::log_setup'
+-- Conan: Target declared 'boost::boost'
+-- Conan: Target declared 'BZip2::BZip2'
+-- Conan: Including build module from '/home/mpk/.conan2/p/b/bzip2e1e96b8a035c1/p/lib/cmake/conan-official-bzip2-variables.cmake'
+-- Conan: Target declared 'libbacktrace::libbacktrace'
+-- Conan: Target declared 'ZLIB::ZLIB'
+-- Conan: Component target declared 'SQLite::SQLite3'
+-- Conan: Target declared 'nlohmann_json::nlohmann_json'
+-- Conan: Target declared 'faiss'
+-- Conan: Component target declared 'OpenBLAS::pthread'
+-- Conan: Target declared 'OpenBLAS::OpenBLAS'
+-- Conan: Target declared 'gflags::gflags'
+-- Conan: Component target declared 'fmt::fmt'
+-- Conan: Component target declared 'OpenSSL::Crypto'
+-- Conan: Component target declared 'OpenSSL::SSL'
+-- Conan: Target declared 'openssl::openssl'
+-- Conan: Including build module from '/home/mpk/.conan2/p/b/opensf855577b9ad8b/p/lib/cmake/conan-official-openssl-variables.cmake'
+-- Conan: Component target declared 'Catch2::Catch2'
+-- Conan: Component target declared 'Catch2::Catch2WithMain'
+-- Conan: Target declared 'CLI11::CLI11'
+-- Conan: Component target declared 'ggml-base'
+-- Conan: Component target declared 'ggml-cpu'
+-- Conan: Component target declared 'ggml::all'
+-- Conan: Component target declared 'llama-cpp::llama'
+-- Conan: Component target declared 'llama-cpp::common'
+-- Conan: Target declared 'llama-cpp::llama-cpp'
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_COMPILER
+
+
+-- Build files have been written to: /home/mpk/src/muclaw/build/Release
+Building...
+[  6%] Building CXX object CMakeFiles/muclaw_core.dir/src/asio_curl.cpp.o
+[ 13%] Building CXX object CMakeFiles/muclaw_core.dir/src/assistant.cpp.o
+[ 20%] Building CXX object CMakeFiles/muclaw_core.dir/src/local_embedder.cpp.o
+[ 26%] Building CXX object CMakeFiles/muclaw_core.dir/src/llm.cpp.o
+[ 33%] Building CXX object CMakeFiles/muclaw_core.dir/src/database.cpp.o
+[ 40%] Building CXX object CMakeFiles/muclaw_core.dir/src/telegram.cpp.o
+[ 46%] Building CXX object CMakeFiles/muclaw_core.dir/src/vector_db.cpp.o
+[ 53%] Linking CXX static library libmuclaw_core.a
+[ 53%] Built target muclaw_core
+[ 60%] Building CXX object CMakeFiles/muclaw.dir/src/main.cpp.o
+[ 66%] Building CXX object CMakeFiles/muclaw_tests.dir/tests/test_local_embedder.cpp.o
+[ 73%] Building CXX object CMakeFiles/muclaw_tests.dir/tests/test_vector_db.cpp.o
+[ 80%] Building CXX object CMakeFiles/muclaw_tests.dir/tests/test_database.cpp.o
+[ 86%] Building CXX object CMakeFiles/muclaw_tests.dir/tests/test_asio_curl.cpp.o
+In file included from /home/mpk/src/muclaw/tests/test_asio_curl.cpp:4:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:408:54: error: no type named 'awaitable_signature' in namespace 'boost::asio::detail'
+  408 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:39: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                       ^~~
+In file included from /home/mpk/src/muclaw/tests/test_asio_curl.cpp:4:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:409:39: error: no type named 'type' in the global namespace
+  409 |       typename result_of<F()>::type>::type) CompletionToken>
+      |                                     ~~^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:408:5: error: expected unqualified-id
+  408 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |     ^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:42: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                          ^
+In file included from /home/mpk/src/muclaw/tests/test_asio_curl.cpp:4:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:425:54: error: no type named 'awaitable_signature' in namespace 'boost::asio::detail'
+  425 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:39: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                       ^~~
+In file included from /home/mpk/src/muclaw/tests/test_asio_curl.cpp:4:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:426:39: error: no type named 'type' in the global namespace
+  426 |       typename result_of<F()>::type>::type) CompletionToken>
+      |                                     ~~^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:425:5: error: expected unqualified-id
+  425 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |     ^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:42: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                          ^
+/home/mpk/src/muclaw/tests/test_asio_curl.cpp:14:5: error: no matching function for call to 'co_spawn'
+   14 |     boost::asio::co_spawn(
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:343:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  343 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  344 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  345 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  346 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:360:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  360 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  361 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  362 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  363 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  364 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  365 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:378:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  378 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  379 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  380 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  381 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  382 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  383 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  384 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:395:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  395 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  396 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  397 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  398 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  399 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  400 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  401 |     >::type)
+      |     ~~~~~~~
+7 errors generated.
+make[2]: *** [CMakeFiles/muclaw_tests.dir/build.make:107: CMakeFiles/muclaw_tests.dir/tests/test_asio_curl.cpp.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [CMakeFiles/Makefile2:157: CMakeFiles/muclaw_tests.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+In file included from /home/mpk/src/muclaw/src/main.cpp:11:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:408:54: error: no type named 'awaitable_signature' in namespace 'boost::asio::detail'
+  408 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:39: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                       ^~~
+In file included from /home/mpk/src/muclaw/src/main.cpp:11:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:409:39: error: no type named 'type' in the global namespace
+  409 |       typename result_of<F()>::type>::type) CompletionToken>
+      |                                     ~~^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:408:5: error: expected unqualified-id
+  408 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |     ^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:42: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                          ^
+In file included from /home/mpk/src/muclaw/src/main.cpp:11:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:425:54: error: no type named 'awaitable_signature' in namespace 'boost::asio::detail'
+  425 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |                                     ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:39: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                       ^~~
+In file included from /home/mpk/src/muclaw/src/main.cpp:11:
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:426:39: error: no type named 'type' in the global namespace
+  426 |       typename result_of<F()>::type>::type) CompletionToken>
+      |                                     ~~^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:425:5: error: expected unqualified-id
+  425 |     BOOST_ASIO_COMPLETION_TOKEN_FOR(typename detail::awaitable_signature<
+      |     ^
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/async_result.hpp:1219:42: note: expanded from macro 'BOOST_ASIO_COMPLETION_TOKEN_FOR'
+ 1219 |   ::boost::asio::completion_token_for<sig>
+      |                                          ^
+/home/mpk/src/muclaw/src/main.cpp:52:5: error: no matching function for call to 'co_spawn'
+   52 |     asio::co_spawn(
+      |     ^~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:343:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  343 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  344 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  345 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  346 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:360:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  360 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  361 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  362 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  363 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  364 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  365 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:378:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  378 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  379 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  380 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  381 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  382 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  383 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  384 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:395:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  395 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  396 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  397 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  398 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  399 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  400 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  401 |     >::type)
+      |     ~~~~~~~
+/home/mpk/src/muclaw/src/main.cpp:85:5: error: no matching function for call to 'co_spawn'
+   85 |     asio::co_spawn(
+      |     ^~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:343:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  343 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  344 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  345 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  346 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:360:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  360 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  361 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  362 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  363 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  364 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  365 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:378:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  378 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  379 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  380 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  381 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  382 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  383 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  384 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:395:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  395 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  396 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  397 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  398 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  399 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  400 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  401 |     >::type)
+      |     ~~~~~~~
+/home/mpk/src/muclaw/src/main.cpp:163:13: error: no matching function for call to 'co_spawn'
+  163 |             asio::co_spawn(io, run_assistant(io), asio::detached);
+      |             ^~~~~~~~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:343:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  343 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  344 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  345 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  346 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  347 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  348 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:360:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  360 | co_spawn(const Executor& ex,
+      | ^        ~~~~~~~~~~~~~~~~~~~
+  361 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  362 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  363 |       (is_executor<Executor>::value || execution::is_executor<Executor>::value)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  364 |         && is_convertible<Executor, AwaitableExecutor>::value
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  365 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:378:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  378 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  379 |     awaitable<T, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  380 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  381 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  382 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  383 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  384 |     >::type)
+      |     ~~~~~~~
+/home/mpk/.conan2/p/b/boost5d31c99c0ea16/p/include/boost/asio/impl/co_spawn.hpp:395:1: note: candidate function template not viable: requires 4 arguments, but 3 were provided
+  395 | co_spawn(ExecutionContext& ctx,
+      | ^        ~~~~~~~~~~~~~~~~~~~~~~
+  396 |     awaitable<void, AwaitableExecutor> a, CompletionToken&& token,
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  397 |     typename constraint<
+      |     ~~~~~~~~~~~~~~~~~~~~
+  398 |       is_convertible<ExecutionContext&, execution_context&>::value
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  399 |         && is_convertible<typename ExecutionContext::executor_type,
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  400 |           AwaitableExecutor>::value
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+  401 |     >::type)
+      |     ~~~~~~~
+9 errors generated.
+make[2]: *** [CMakeFiles/muclaw.dir/build.make:79: CMakeFiles/muclaw.dir/src/main.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:125: CMakeFiles/muclaw.dir/all] Error 2
+make: *** [Makefile:101: all] Error 2
