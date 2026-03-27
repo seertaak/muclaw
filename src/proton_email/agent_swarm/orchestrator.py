@@ -1,6 +1,6 @@
 """Orchestrator for the Dev Team Agent Swarm.
 
-Spawns Claude Code CLI subprocesses for each role to implement
+Spawns AI agents using the Anthropic SDK for each role to implement
 the virtual development team workflow.
 """
 
@@ -9,6 +9,8 @@ import sys
 import subprocess
 import argparse
 from pathlib import Path
+
+import anthropic
 
 from proton_email.agent_swarm.github_state import (
     read_current_issue,
@@ -30,33 +32,175 @@ from proton_email.telegram.bot import (
 STATE_DIR = Path("/app/state")
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 
+SKILLS_DIR = Path("/app/.claude/skills")
 
-def spawn_claude(skill: str, extra_args: list[str] = None) -> subprocess.Popen:
-    """Spawn a Claude Code CLI subprocess with a skill.
+# GitHub tools available to agents
+GITHUB_TOOLS = [
+    {
+        "name": "run_gh",
+        "description": "Run a GitHub CLI command. Use this to create issues, PRs, etc.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "args": {"type": "string", "description": "The gh command args (e.g., 'issue create --title Foo --body Bar')"},
+            },
+            "required": ["args"],
+        },
+    },
+    {
+        "name": "write_file",
+        "description": "Write content to a file",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "File path (relative to /app)"},
+                "content": {"type": "string", "description": "Content to write"},
+            },
+            "required": ["path", "content"],
+        },
+    },
+    {
+        "name": "read_file",
+        "description": "Read content from a file",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "description": "File path (relative to /app)"},
+            },
+            "required": ["path"],
+        },
+    },
+    {
+        "name": "run_command",
+        "description": "Run a shell command",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "command": {"type": "string", "description": "Command to run"},
+                "cwd": {"type": "string", "description": "Working directory (default /app)"},
+            },
+            "required": ["command"],
+        },
+    },
+]
 
-    Returns the Popen object for the subprocess.
-    """
-    cmd = ["claude", "--skill", skill]
-    if extra_args:
-        cmd.extend(extra_args)
 
-    env = os.environ.copy()
-    # Ensure we're in the right directory
-    env["PWD"] = "/app"
+def get_client() -> anthropic.Anthropic:
+    """Get the Anthropic client."""
+    return anthropic.Anthropic()
 
-    return subprocess.Popen(
-        cmd,
-        cwd="/app",
-        env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+
+def load_skill(skill_name: str) -> str:
+    """Load a skill file as a system prompt."""
+    skill_path = SKILLS_DIR / f"{skill_name}.md"
+    return skill_path.read_text()
+
+
+def run_gh_command(args: str) -> str:
+    """Execute a gh command and return output."""
+    result = subprocess.run(
+        ["gh"] + args.split(),
+        capture_output=True,
         text=True,
+        cwd="/app",
     )
+    return result.stdout + result.stderr
+
+
+def run_shell_command(command: str, cwd: str = "/app") -> str:
+    """Execute a shell command and return output."""
+    result = subprocess.run(
+        command,
+        shell=True,
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+    )
+    return result.stdout + result.stderr
+
+
+def spawn_agent(skill_name: str, user_message: str, context: dict = None) -> str:
+    """Spawn an agent with the given skill and get its response.
+
+    Returns the agent's final response text.
+    """
+    client = get_client()
+    system_prompt = load_skill(skill_name)
+
+    if context:
+        context_str = "\n".join([f"- {k}: {v}" for k, v in context.items()])
+        system_prompt += f"\n\n## Context\n{context_str}"
+
+    messages = [{"role": "user", "content": user_message}]
+    max_turns = 10
+    turn = 0
+
+    while turn < max_turns:
+        turn += 1
+
+        response = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=4096,
+            system=system_prompt,
+            messages=messages,
+            tools=GITHUB_TOOLS,
+        )
+
+        # Add assistant response to messages
+        messages.append({"role": "assistant", "content": response.content})
+
+        # Check if we have stop reason (no more tool calls needed)
+        if response.stop_reason == "end_turn":
+            # Extract text content
+            text = ""
+            for block in response.content:
+                if hasattr(block, 'text'):
+                    text += block.text
+            return text
+
+        # Process tool uses
+        for block in response.content:
+            if hasattr(block, 'type') and block.type == "tool_use":
+                tool_name = block.name
+                tool_input = block.input
+
+                if tool_name == "run_gh":
+                    result = run_gh_command(tool_input["args"])
+                elif tool_name == "run_command":
+                    result = run_shell_command(
+                        tool_input["command"],
+                        tool_input.get("cwd", "/app")
+                    )
+                elif tool_name == "write_file":
+                    path = Path(tool_input["path"])
+                    if not path.is_absolute():
+                        path = Path("/app") / path
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text(tool_input["content"])
+                    result = f"Written to {path}"
+                elif tool_name == "read_file":
+                    path = Path(tool_input["path"])
+                    if not path.is_absolute():
+                        path = Path("/app") / path
+                    result = path.read_text()
+                else:
+                    result = f"Unknown tool: {tool_name}"
+
+                # Add tool result to messages
+                messages.append({
+                    "role": "user",
+                    "content": [{
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": result,
+                    }]
+                })
+
+    return "Max turns reached"
 
 
 def cmd_start(initial_request: str, chat_id: str = None) -> None:
     """Start the swarm by launching the PM Assistant."""
-    # Store chat ID if provided (for backward compatibility)
     if chat_id:
         store_chat_id(chat_id)
 
@@ -67,35 +211,30 @@ def cmd_start(initial_request: str, chat_id: str = None) -> None:
 
     # Spawn PM Assistant
     print("[Orchestrator] Spawning PM Assistant...")
-    proc = spawn_claude("pm-assistant", ["--request", initial_request])
-
-    # Stream output
-    for line in proc.stdout:
-        print(f"[PM Assistant] {line}", end="")
-
-    proc.wait()
-    print(f"[Orchestrator] PM Assistant finished with code {proc.returncode}")
+    response = spawn_agent(
+        "pm-assistant",
+        initial_request,
+        context={"muclaw_dir": "/app", "state_dir": str(STATE_DIR)}
+    )
+    print(f"[PM Assistant] {response}")
 
 
 def cmd_status() -> None:
     """Show current status of all swarm components."""
     print("=== Swarm Status ===")
 
-    # Check issue
     issue_num = read_current_issue()
     if issue_num:
         print(f"Current Issue: #{issue_num}")
     else:
         print("Current Issue: None")
 
-    # Check PR
     pr_num = read_current_pr()
     if pr_num:
         print(f"Current PR: #{pr_num}")
     else:
         print("Current PR: None")
 
-    # Show git branch
     result = subprocess.run(
         ["git", "branch", "--show-current"],
         capture_output=True,
@@ -105,9 +244,8 @@ def cmd_status() -> None:
     if branch:
         print(f"Current Branch: {branch}")
     else:
-        print("Current Branch: None (on detached HEAD or no repo)")
+        print("Current Branch: None")
 
-    # Show pending agents
     print("\nNo active agents currently running.")
 
 
@@ -121,14 +259,24 @@ def cmd_resume(issue_num: int = None) -> None:
         return
 
     print(f"[Orchestrator] Resuming issue #{issue_num}")
-    spawn_claude("team-manager", ["--issue", str(issue_num)])
+    response = spawn_agent(
+        "team-manager",
+        f"Resume working on issue #{issue_num}",
+        context={"issue_num": str(issue_num), "muclaw_dir": "/app"}
+    )
+    print(f"[Team Manager] {response}")
 
 
 def cmd_invoke_team_manager(issue_num: int) -> None:
     """Invoke the team manager for a specific issue."""
     write_current_issue(issue_num)
     print(f"[Orchestrator] Invoking Team Manager for issue #{issue_num}")
-    spawn_claude("team-manager", ["--issue", str(issue_num)])
+    response = spawn_agent(
+        "team-manager",
+        f"Process issue #{issue_num}",
+        context={"issue_num": str(issue_num), "muclaw_dir": "/app"}
+    )
+    print(f"[Team Manager] {response}")
 
 
 def main():
