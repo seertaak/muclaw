@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proton-email"
+version = "0.1.0"
+description = "ProtonMail Bridge email client with SQLite storage and full-text search"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "click>=8.0.0",
+    "tabulate>=0.8.0",
+]
+
+[project.scripts]
+proton-email = "proton_email.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]

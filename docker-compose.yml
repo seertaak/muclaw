@@ -1,0 +1,10 @@
+services:
+  proton-email:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ~/.env:/run/secrets/proton_email.env:ro
+    environment:
+      - PROTON_EMAIL_ENV_PATH=/run/secrets/proton_email.env
+      - PROTON_EMAIL_DATA_DIR=/app/data
+    restart: unless-stopped
