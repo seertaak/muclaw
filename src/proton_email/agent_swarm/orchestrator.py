@@ -12,6 +12,26 @@ from pathlib import Path
 
 import anthropic
 
+ENV_FILE = "/run/secrets/proton_email.env"
+
+
+def _load_env():
+    """Load env vars from secrets file if not already set."""
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return  # Already loaded
+    try:
+        with open(ENV_FILE) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    os.environ[key] = value
+    except (FileNotFoundError, IOError):
+        pass
+
+
+_load_env()
+
 from proton_email.agent_swarm.github_state import (
     read_current_issue,
     write_current_issue,
@@ -86,8 +106,10 @@ GITHUB_TOOLS = [
 
 
 def get_client() -> anthropic.Anthropic:
-    """Get the Anthropic client."""
-    return anthropic.Anthropic()
+    """Get the Anthropic client configured for Minimax."""
+    return anthropic.Anthropic(
+        base_url="https://api.minimax.io/anthropic"
+    )
 
 
 def load_skill(skill_name: str) -> str:
@@ -139,7 +161,7 @@ def spawn_agent(skill_name: str, user_message: str, context: dict = None) -> str
         turn += 1
 
         response = client.messages.create(
-            model="claude-opus-4-6",
+            model="MiniMax-M2.7",
             max_tokens=4096,
             system=system_prompt,
             messages=messages,
