@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 proton-email = "proton_email.cli:cli"
+muclaw = "proton_email.agent_swarm.orchestrator:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

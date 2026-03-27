@@ -3,8 +3,13 @@ services:
     build: .
     volumes:
       - ./data:/app/data
+      - muclaw_state:/app/state
       - ~/.env:/run/secrets/proton_email.env:ro
     environment:
       - PROTON_EMAIL_ENV_PATH=/run/secrets/proton_email.env
       - PROTON_EMAIL_DATA_DIR=/app/data
+      - MUCLAW_STATE_DIR=/app/state
     restart: unless-stopped
+
+volumes:
+  muclaw_state:

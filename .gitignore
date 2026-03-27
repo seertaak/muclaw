@@ -24,4 +24,6 @@ data/
 Thumbs.db
 
 # Claude
-.claude/
+.prompts/
+.claude/settings.json
+.claude/settings.local.json
