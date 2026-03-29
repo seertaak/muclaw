@@ -48,12 +48,96 @@ uv run proton-email --help
 
 ## Docker Deployment
 
+### Building the Docker Image
+
+```bash
+# Build the image locally
+docker build -t muclaw .
+
+# Or use Docker Compose (which builds automatically)
+docker compose build
+```
+
+### Running with Docker Compose
+
 1. Ensure your `.env` file is in your home directory (`~/.env`)
 
-2. Build and run with Docker Compose:
+2. Build and run:
 
 ```bash
 docker compose up -d
+```
+
+3. View logs:
+
+```bash
+docker compose logs -f
+```
+
+### Environment Variables
+
+Configure the following environment variables in your `.env` file:
+
+| Variable | Description |
+|----------|-------------|
+| `TELEGRAM_BOT_API_TOKEN` | Telegram bot token for notifications |
+| `TELEGRAM_USER_ID` | Your Telegram user ID for authorization |
+| `GITHUB_USER_EMAIL` | GitHub user email for git operations |
+| `GITHUB_USER_NAME` | GitHub username for git operations |
+| `GITHUB_SSH_KEY` | Path to SSH private key for GitHub access |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | GitHub PAT for API access |
+| `MINIMAX_API_KEY` | MiniMax API key for AI features |
+
+### Docker Secrets
+
+For production deployments, use Docker secrets instead of plain text `.env` files:
+
+```bash
+# Create the secrets file
+echo "TELEGRAM_BOT_API_TOKEN=your_token_here" | docker secret create proton_email_secrets.env -
+echo "TELEGRAM_USER_ID=123456789" | docker secret create proton_email_secrets.env -
+# ... add other secrets
+
+# Update docker-compose.yml to use secrets (Swarm mode)
+services:
+  proton-email:
+    secrets:
+      - proton_email_secrets
+    # ...
+
+secrets:
+  proton_email_secrets:
+    external: true
+```
+
+The entrypoint script loads secrets from `/run/secrets/proton_email.env` or `/run/secrets/secrets.env`.
+
+### Volume Mounts for Data Persistence
+
+The container uses the following volumes:
+
+| Volume | Mount Point | Purpose |
+|--------|-------------|---------|
+| `./data` | `/app/data` | SQLite database and attachments |
+| `muclaw_state` | `/app/state` | Application state and worktrees |
+| `~/.env` | `/run/secrets/proton_email.env` | Secrets (read-only) |
+
+### Automatic Sync
+
+When running without arguments, the container starts cron which automatically syncs data every minute. To run manual commands instead:
+
+```bash
+# Run a single sync
+docker compose run --rm proton-email proton-email sync
+
+# List recent records
+docker compose run --rm proton-email proton-email list
+
+# Search emails
+docker compose run --rm proton-email proton-email search "query"
+
+# Open an interactive shell
+docker compose run --rm proton-email bash
 ```
 
 ## Database
