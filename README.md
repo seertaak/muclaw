@@ -48,12 +48,130 @@ uv run proton-email --help
 
 ## Docker Deployment
 
-1. Ensure your `.env` file is in your home directory (`~/.env`)
+This project is designed to run as a Docker container with automatic syncing via cron.
 
-2. Build and run with Docker Compose:
+### Building the Image
+
+Build the Docker image:
+
+```bash
+docker build -t muclaw .
+```
+
+Or build and run with Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+### Configuration
+
+Create a `.env` file containing your secrets. The container expects secrets at `/run/secrets/proton_email.env` (mounted from your local `~/.env`).
+
+#### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `TELEGRAM_BOT_API_TOKEN` | Telegram bot API token for notifications |
+| `TELEGRAM_USER_ID` | Your Telegram user ID for bot access |
+| `GITHUB_USER_EMAIL` | GitHub user email for git operations |
+| `GITHUB_USER_NAME` | GitHub username for git operations |
+| `GITHUB_SSH_KEY` | Path to SSH private key for GitHub access |
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | GitHub personal access token |
+| `MINIMAX_API_KEY` | MiniMax API key for AI features |
+
+#### Example `.env` file
+
+```bash
+# Telegram Configuration
+TELEGRAM_BOT_API_TOKEN=your_bot_token_here
+TELEGRAM_USER_ID=123456789
+
+# GitHub Configuration
+GITHUB_USER_EMAIL=your@email.com
+GITHUB_USER_NAME=yourusername
+GITHUB_SSH_KEY=/root/.ssh/id_ed25519
+GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxxxxxxxxxxx
+
+# AI Services
+MINIMAX_API_KEY=your_minimax_api_key
+```
+
+### Running the Container
+
+1. Place your `.env` file in your home directory:
+
+```bash
+cp .env ~/.env
+```
+
+2. Start the container with Docker Compose:
 
 ```bash
 docker compose up -d
+```
+
+The container will:
+- Load secrets from `~/.env` (mounted as a Docker secret)
+- Start cron to run sync automatically every minute
+- Mount `./data` for database persistence
+- Mount a named volume (`muclaw_state`) for application state
+
+### Docker Secrets
+
+The container uses Docker's secret mounting mechanism. The entrypoint script loads environment variables from `/run/secrets/proton_email.env`.
+
+With Docker Compose, mount your `.env` file:
+
+```yaml
+volumes:
+  - ~/.env:/run/secrets/proton_email.env:ro
+```
+
+### Volume Mounts
+
+The following volumes are configured for data persistence:
+
+| Host Path | Container Path | Purpose |
+|-----------|---------------|---------|
+| `./data` | `/app/data` | SQLite database and attachments |
+| `muclaw_state` (named volume) | `/app/state` | Application state and worktrees |
+| `~/.env` | `/run/secrets/proton_email.env:ro` | Secrets (read-only) |
+
+### Viewing Logs
+
+Check sync logs:
+
+```bash
+docker compose logs -f
+```
+
+View cron execution logs inside the container:
+
+```bash
+docker exec muclaw-proton-email-1 tail -f /var/log/proton_email_sync.log
+```
+
+### Running Commands Manually
+
+To run a single command inside the container:
+
+```bash
+docker compose exec proton-email proton-email sync
+docker compose exec proton-email proton-email list
+docker compose exec proton-email proton-email search "query"
+```
+
+### Stopping the Container
+
+```bash
+docker compose down
+```
+
+To also remove volumes:
+
+```bash
+docker compose down -v
 ```
 
 ## Database
